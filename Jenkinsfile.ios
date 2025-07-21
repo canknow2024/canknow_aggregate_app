@@ -1,0 +1,54 @@
+pipeline {
+    agent { label 'mac' }
+    environment {
+        FLUTTER_HOME = '/usr/local/flutter'
+        PATH = "${env.FLUTTER_HOME}/bin:${env.PATH}"
+        P12_PASSWORD = '你的p12密码' // 这里填你的p12导出时设置的密码
+    }
+    stages {
+        stage('检出代码') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('导入签名证书和描述文件') {
+            steps {
+                sh '''
+                    security import ios/signing/ios_distribution.p12 -k ~/Library/Keychains/login.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+                    mkdir -p ~/Library/MobileDevice/Provisioning Profiles
+                    cp ios/signing/AdHoc.mobileprovision ~/Library/MobileDevice/Provisioning Profiles/
+                '''
+            }
+        }
+        stage('安装依赖') {
+            steps {
+                sh 'flutter pub get'
+            }
+        }
+        stage('构建iOS Release') {
+            steps {
+                sh 'flutter build ios --release'
+            }
+        }
+        stage('导出ipa包') {
+            steps {
+                dir('ios') {
+                    sh '''
+                        xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath $PWD/../build/Runner.xcarchive archive
+                        xcodebuild -exportArchive -archivePath $PWD/../build/Runner.xcarchive -exportOptionsPlist signing/ExportOptions.plist -exportPath $PWD/../build/ios
+                    '''
+                }
+            }
+        }
+        stage('归档产物') {
+            steps {
+                archiveArtifacts artifacts: 'build/ios/*.ipa', fingerprint: true
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
