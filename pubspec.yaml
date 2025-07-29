@@ -67,7 +67,7 @@ dependencies:
   # 第三方登录通用
   sign_in_with_apple: ^7.0.1
   package_info_plus: any
-  intl: ^0.20.2
+  intl: any
   shimmer: ^3.0.0
   # 富文本显示
   flutter_widget_from_html_core: ^0.16.0
