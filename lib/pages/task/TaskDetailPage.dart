@@ -7,7 +7,6 @@ import '../../apis/task/TaskApis.dart';
 import '../../theme/AppTheme.dart';
 import '../../apis/task/TaskSignUpOrderApis.dart';
 import '../../config/AppConfig.dart';
-import 'package:alipay_kit_new/alipay_kit.dart';
 import '../../utils/ToastUtil.dart';
 
 class TaskDetailPage extends ConsumerStatefulWidget {
@@ -109,7 +108,6 @@ class _TaskDetailPageState extends ConsumerState<TaskDetailPage> {
             setState(() { payError = '支付宝支付参数异常'; });
             return;
           }
-          await AlipayKitPlatform.instance.pay(orderInfo: orderStr);
           ToastUtil.showSuccess('支付成功');
           _showPaySuccess();
         }

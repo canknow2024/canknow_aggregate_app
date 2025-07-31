@@ -77,9 +77,6 @@ dependencies:
   flutter_card_swiper: 7.0.2
   tcard: ^1.3.5
   card_swiper: any
-  alipay_kit_new: 6.0.2
-  alipay_kit_ios_new: 6.0.3
-  alipay_kit_android_new: 6.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
