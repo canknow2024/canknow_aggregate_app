@@ -72,6 +72,6 @@ class NetworkConfig {
   
   // 根据环境获取API地址
   static String getApiUrl() {
-    return 'http://192.168.1.3'; // 生产环境API地址
+    return 'https://aggregate-daily.dtty.tech'; // 生产环境API地址
   }
 } 
