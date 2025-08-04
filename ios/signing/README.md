@@ -10,7 +10,7 @@
 
 2. **AdHoc.mobileprovision**
    - AdHoc 类型的描述文件。
-   - 需在 Apple Developer 网站创建并下载，包含所有需要安装 App 的设备 UDID。
+   - 需在 Apple Developer 网站创建并下载，包1含所有需要安装 App 的设备 UDID。
 
 3. **ExportOptions.plist**
    - 导出 IPA 包的配置文件。

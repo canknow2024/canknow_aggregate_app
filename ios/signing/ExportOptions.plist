@@ -5,11 +5,11 @@
     <key>method</key>
     <string>ad-hoc</string>
     <key>teamID</key>
-    <string>请填写你的团队ID</string>
+    <string>323LXQXZ6R</string>
     <key>provisioningProfiles</key>
     <dict>
-        <key>com.canknow.aggregate</key>
-        <string>请填写你的描述文件名称</string>
+        <key>com.canknow.canknowAggregateApp</key>
+        <string>canknow</string>
     </dict>
     <key>compileBitcode</key>
     <false/>
