@@ -52,11 +52,13 @@
 		<true/>
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
 	</dict>
 	<!-- 本地网络权限 -->
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>此应用需要访问本地网络以支持Flutter调试功能</string>
-	<!-- 本地网络权限 -->
+	<!-- Bonjour服务配置 -->
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_dartobservatory._tcp</string>
