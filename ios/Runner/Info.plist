@@ -1,67 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>CFBundleDisplayName</key>
-	<string>Canknow Aggregate App</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>canknow_aggregate_app</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<!-- 网络权限配置 -->
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-		<key>NSAllowsArbitraryLoadsInWebContent</key>
-		<true/>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-	</dict>
-	<!-- 本地网络权限 -->
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>此应用需要访问本地网络以支持Flutter调试功能</string>
-	<!-- Bonjour服务配置 -->
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_dartobservatory._tcp</string>
-	</array>
-</dict>
+    <dict>
+        <!-- 基础配置 -->
+        <key>CFBundleDevelopmentRegion</key>
+        <string>$(DEVELOPMENT_LANGUAGE)</string>
+        <key>CFBundleDisplayName</key>
+        <string>Canknow Aggregate App</string>
+        <key>CFBundleExecutable</key>
+        <string>$(EXECUTABLE_NAME)</string>
+        <key>CFBundleIdentifier</key>
+        <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleName</key>
+        <string>canknow_aggregate_app</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleShortVersionString</key>
+        <string>$(FLUTTER_BUILD_NAME)</string>
+        <key>CFBundleVersion</key>
+        <string>$(FLUTTER_BUILD_NUMBER)</string>
+        <key>LSRequiresIPhoneOS</key>
+        <true/>
+
+        <!-- 启动屏幕 -->
+        <key>UILaunchStoryboardName</key>
+        <string>LaunchScreen</string>
+
+        <!-- 屏幕方向 -->
+        <key>UISupportedInterfaceOrientations</key>
+        <array>
+            <string>UIInterfaceOrientationPortrait</string>
+            <string>UIInterfaceOrientationLandscapeLeft</string>
+            <string>UIInterfaceOrientationLandscapeRight</string>
+        </array>
+        <key>UISupportedInterfaceOrientations~ipad</key>
+        <array>
+            <string>UIInterfaceOrientationPortrait</string>
+            <string>UIInterfaceOrientationPortraitUpsideDown</string>
+            <string>UIInterfaceOrientationLandscapeLeft</string>
+            <string>UIInterfaceOrientationLandscapeRight</string>
+        </array>
+
+        <!-- 性能优化 -->
+        <key>CADisableMinimumFrameDurationOnPhone</key>
+        <true/>
+        <key>UIApplicationSupportsIndirectInputEvents</key>
+        <true/>
+
+        <!-- 网络权限（调试用，正式版可移除） -->
+        <key>NSAppTransportSecurity</key>
+        <dict>
+            <key>NSAllowsArbitraryLoads</key>
+            <true/>
+            <key>NSAllowsArbitraryLoadsInWebContent</key>
+            <true/>
+            <key>NSAllowsLocalNetworking</key>
+            <true/>
+        </dict>
+        <key>NSLocalNetworkUsageDescription</key>
+        <string>此应用需要访问本地网络以支持Flutter调试功能</string>
+        <key>NSBonjourServices</key>
+        <array>
+            <string>_dartobservatory._tcp</string>
+        </array>
+
+        <!-- ===== 以下是新增的权限配置 ===== -->
+        <!-- 1. 相机权限 -->
+        <key>NSCameraUsageDescription</key>
+        <string>需要访问相机以拍摄照片或扫描二维码</string>
+
+        <!-- 2. 定位权限 -->
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>需要获取您的位置以提供附近服务</string>
+        <!-- 如果需要后台定位 -->
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>需要持续获取位置以提供实时服务</string>
+        <key>NSLocationAlwaysUsageDescription</key>
+        <string>需要持续获取位置以提供实时服务</string>
+
+        <!-- 3. 后台运行权限 -->
+        <key>UIBackgroundModes</key>
+        <array>
+            <!-- 后台定位 -->
+            <string>location</string>
+            <!-- 后台蓝牙 -->
+            <string>bluetooth-central</string>
+            <string>bluetooth-peripheral</string>
+            <!-- 后台音频（如果需要） -->
+            <string>audio</string>
+            <!-- 后台网络请求（如果需要） -->
+            <string>fetch</string>
+        </array>
+
+        <!-- 4. 通知权限 -->
+        <key>NSUserNotificationsUsageDescription</key>
+        <string>需要发送通知以提醒重要信息</string>
+        <!-- iOS 12+ 临时通知权限 -->
+        <key>UNUserNotificationCenterEnabled</key>
+        <true/>
+
+        <!-- 5. 蓝牙权限 -->
+        <key>NSBluetoothAlwaysUsageDescription</key>
+        <string>需要访问蓝牙以连接设备</string>
+        <key>NSBluetoothPeripheralUsageDescription</key>
+        <string>需要访问蓝牙以连接设备</string>
+    </dict>
 </plist>
