@@ -3,7 +3,7 @@ pipeline {
     environment {
         FLUTTER_HOME = '/usr/local/flutter'
         PATH = "${env.FLUTTER_HOME}/bin:${env.PATH}"
-        P12_PASSWORD = '你设置的p12密码' // 替换为你导出p12时设置的密码
+        P12_PASSWORD = 'lianhubo' // 替换为你导出p12时设置的密码
     }
     stages {
         stage('检出代码') {
