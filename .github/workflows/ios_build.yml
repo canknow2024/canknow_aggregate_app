@@ -57,17 +57,59 @@ jobs:
           
           echo "✅ 签名文件检查通过"
 
+      - name: Setup keychain
+        run: |
+          echo "设置钥匙串..."
+          # 创建临时钥匙串
+          security create-keychain -p "" build.keychain
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings -t 3600 -l ~/Library/Keychains/build.keychain
+
       - name: Import signing certificate
         run: |
-          security import ios/signing/ios_distribution.p12 -k ~/Library/Keychains/login.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+          echo "导入签名证书..."
+          # 导入证书到临时钥匙串
+          security import ios/signing/ios_distribution.p12 -k build.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+          
+          # 验证证书导入
+          echo "验证证书导入..."
+          security find-identity -v -p codesigning build.keychain
+          
+          # 设置证书信任
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
 
       - name: Copy provisioning profile
         run: |
+          echo "复制描述文件..."
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp ios/signing/AdHoc.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+          
+          # 验证描述文件
+          echo "验证描述文件..."
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: Build iOS
-        run: flutter build ios --release
+        run: |
+          echo "开始构建iOS应用..."
+          
+          # 显示当前钥匙串信息
+          echo "🔍 当前钥匙串信息:"
+          security list-keychains
+          security default-keychain
+          
+          # 显示可用证书
+          echo "🔑 可用证书:"
+          security find-identity -v -p codesigning build.keychain
+          
+          # 显示描述文件
+          echo "📋 描述文件:"
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+          
+          # 开始构建
+          echo "🚀 开始 Flutter 构建..."
+          flutter build ios --release
 
       - name: Build Archive
         run: |

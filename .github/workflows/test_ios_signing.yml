@@ -1,0 +1,77 @@
+name: Test iOS Signing
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-signing:
+    runs-on: macos-latest
+    env:
+      P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check signing files
+        run: |
+          echo "🔍 检查签名文件..."
+          ls -la ios/signing/
+          
+          if [ ! -f "ios/signing/ios_distribution.p12" ]; then
+            echo "❌ 缺少 ios_distribution.p12 文件"
+            exit 1
+          fi
+          
+          if [ ! -f "ios/signing/AdHoc.mobileprovision" ]; then
+            echo "❌ 缺少 AdHoc.mobileprovision 文件"
+            exit 1
+          fi
+          
+          echo "✅ 签名文件存在"
+
+      - name: Setup keychain
+        run: |
+          echo "🔧 设置钥匙串..."
+          security create-keychain -p "" build.keychain
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings -t 3600 -l ~/Library/Keychains/build.keychain
+
+      - name: Import certificate
+        run: |
+          echo "📥 导入证书..."
+          security import ios/signing/ios_distribution.p12 -k build.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+          
+          echo "🔍 验证证书..."
+          security find-identity -v -p codesigning build.keychain
+          
+          echo "🔒 设置证书信任..."
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+
+      - name: Copy provisioning profile
+        run: |
+          echo "📋 复制描述文件..."
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp ios/signing/AdHoc.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+          
+          echo "🔍 验证描述文件..."
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Test code signing
+        run: |
+          echo "🧪 测试代码签名..."
+          
+          # 检查证书是否可用于签名
+          security find-identity -v -p codesigning build.keychain | grep "iPhone Distribution"
+          
+          # 检查描述文件
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/AdHoc.mobileprovision | grep -A 5 "TeamIdentifier"
+
+      - name: Show keychain info
+        run: |
+          echo "📊 钥匙串信息:"
+          security list-keychains
+          security default-keychain
+          
+          echo "🔑 证书列表:"
+          security find-identity -v -p codesigning build.keychain 
