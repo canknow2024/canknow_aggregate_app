@@ -32,7 +32,7 @@ jobs:
       - name: Copy provisioning profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp ios/signing/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+          cp ios/signing/AdHoc.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: Build Archive
         run: |
