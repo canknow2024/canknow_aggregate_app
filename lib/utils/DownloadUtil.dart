@@ -63,7 +63,8 @@ class DownloadUtil {
         onComplete();
       }
       return true;
-    } catch (e) {
+    }
+    catch (e) {
       print('简单下载失败: $e');
       if (onError != null) {
         onError('下载失败: $e');
@@ -113,13 +114,15 @@ class DownloadUtil {
           onComplete();
         }
         return true;
-      } else {
+      }
+      else {
         if (onError != null) {
           onError('安装失败');
         }
         return false;
       }
-    } catch (e) {
+    }
+    catch (e) {
       print('下载并安装APK失败: $e');
       if (onError != null) {
         onError('下载失败: $e');
@@ -135,6 +138,7 @@ class DownloadUtil {
       
       // 检查文件是否存在
       final file = File(filePath);
+
       if (!await file.exists()) {
         print('APK文件不存在: $filePath');
         return false;
@@ -146,11 +150,13 @@ class DownloadUtil {
       if (success) {
         print('APK安装启动成功');
         return true;
-      } else {
+      }
+      else {
         print('APK安装启动失败');
         return false;
       }
-    } catch (e) {
+    }
+    catch (e) {
       print('安装APK异常: $e');
       return false;
     }
@@ -196,7 +202,8 @@ class DownloadUtil {
             if (onComplete != null) {
               onComplete();
             }
-          } else if (status == DownloadTaskStatus.failed) {
+          }
+          else if (status == DownloadTaskStatus.failed) {
             if (onError != null) {
               onError('下载失败');
             }
@@ -205,7 +212,8 @@ class DownloadUtil {
       });
 
       return taskId;
-    } catch (e) {
+    }
+    catch (e) {
       print('下载APK失败: $e');
       if (onError != null) {
         onError('下载启动失败: $e');
@@ -229,7 +237,8 @@ class DownloadUtil {
       // 备用方案：使用应用文档目录
       final appDir = await getApplicationDocumentsDirectory();
       return appDir.path;
-    } else {
+    }
+    else {
       final appDir = await getApplicationDocumentsDirectory();
       return appDir.path;
     }
@@ -245,7 +254,8 @@ class DownloadUtil {
     try {
       await FlutterDownloader.cancel(taskId: taskId);
       print('已取消下载任务: $taskId');
-    } catch (e) {
+    }
+    catch (e) {
       print('取消下载失败: $e');
     }
   }
@@ -265,7 +275,8 @@ class DownloadUtil {
     try {
       final file = File(filePath);
       return await file.exists();
-    } catch (e) {
+    }
+    catch (e) {
       print('检查文件存在失败: $e');
       return false;
     }
@@ -279,7 +290,8 @@ class DownloadUtil {
         return await file.length();
       }
       return 0;
-    } catch (e) {
+    }
+    catch (e) {
       print('获取文件大小失败: $e');
       return 0;
     }

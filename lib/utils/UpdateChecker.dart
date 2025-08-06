@@ -31,7 +31,8 @@ class UpdateChecker {
 
       if (_isNewerVersion(latestVersion, currentVersion) && downloadUrl.isNotEmpty) {
         _showUpdateDialog(context, latestVersion, changeLogs, forceUpdate, downloadUrl);
-      } else if (showNoUpdateToast) {
+      }
+      else if (showNoUpdateToast) {
         ToastUtil.showSuccess('当前已是最新版本');
       }
     }
@@ -97,16 +98,19 @@ class _UpdateDialogState extends State<_UpdateDialog> {
     try {
       // 获取下载目录
       String savePath;
+
       if (Platform.isAndroid) {
         final directory = await getExternalStorageDirectory();
         if (directory != null) {
           savePath = directory.path;
-        } else {
+        }
+        else {
           // 备用方案：使用应用文档目录
           final appDir = await getApplicationDocumentsDirectory();
           savePath = appDir.path;
         }
-      } else {
+      }
+      else {
         final appDir = await getApplicationDocumentsDirectory();
         savePath = appDir.path;
       }
@@ -140,7 +144,8 @@ class _UpdateDialogState extends State<_UpdateDialog> {
       // 下载完成后自动安装
       await _installApk(filePath);
       
-    } catch (e) {
+    }
+    catch (e) {
       print('开始下载失败: $e');
       setState(() {
         _downloading = false;
@@ -168,13 +173,15 @@ class _UpdateDialogState extends State<_UpdateDialog> {
         ToastUtil.showSuccess('正在安装新版本...');
         // 关闭对话框
         Navigator.of(context).pop();
-      } else {
+      }
+      else {
         print('APK安装启动失败');
         ToastUtil.showError('安装启动失败，请手动安装');
         // 显示手动安装提示
         _showManualInstallDialog(filePath);
       }
-    } catch (e) {
+    }
+    catch (e) {
       print('安装APK异常: $e');
       ToastUtil.showError('安装失败: $e');
       _showManualInstallDialog(filePath);
