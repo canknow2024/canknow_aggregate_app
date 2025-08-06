@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import '../apis/system/AppVersionApis.dart';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../config/AppConfig.dart';
 import '../plugins/InstallApkPlugin.dart';
 import 'ToastUtil.dart';
@@ -88,6 +89,20 @@ class _UpdateDialogState extends State<_UpdateDialog> {
   String? _downloadedFilePath;
 
   void _startDownload() async {
+    if (Platform.isIOS) {
+      // 对于iOS，直接打开App Store链接
+      final appStoreUrl = widget.url;
+
+      if (await canLaunchUrl(Uri.parse(appStoreUrl))) {
+        await launchUrl(Uri.parse(appStoreUrl));
+      }
+      else {
+        ToastUtil.showError('无法打开App Store');
+      }
+      Navigator.of(context).pop();
+      return;
+    }
+
     setState(() {
       _downloading = true;
       _progress = 0;
@@ -99,18 +114,12 @@ class _UpdateDialogState extends State<_UpdateDialog> {
       // 获取下载目录
       String savePath;
 
-      if (Platform.isAndroid) {
-        final directory = await getExternalStorageDirectory();
-        if (directory != null) {
-          savePath = directory.path;
-        }
-        else {
-          // 备用方案：使用应用文档目录
-          final appDir = await getApplicationDocumentsDirectory();
-          savePath = appDir.path;
-        }
+      final directory = await getExternalStorageDirectory();
+      if (directory != null) {
+        savePath = directory.path;
       }
       else {
+        // 备用方案：使用应用文档目录
         final appDir = await getApplicationDocumentsDirectory();
         savePath = appDir.path;
       }
