@@ -1,3 +1,4 @@
+import 'package:canknow_aggregate_app/config/JConfig.dart';
 import 'package:jverify/jverify.dart';
 
 class JverifyPlugin {
@@ -38,13 +39,14 @@ class JverifyPlugin {
     JverifyPlugin.jverify.setCustomAuthorizationView(false, uiConfig);
   }
 
+  // 只对ios设置有效
   static initialize() {
     jverify.setDebugMode(true);
     jverify.setCollectionAuth(true);
     setCustomUI(); // 新增：初始化时设置自定义UI
     jverify.setup(
-        appKey: "8400711789178fdf51f6bb60",
-        channel: "developer-default"
+        appKey: JConfig.appKey,
+        channel: JConfig.channel
     );
   }
 }

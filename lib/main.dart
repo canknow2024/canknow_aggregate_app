@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:canknow_aggregate_app/plugins/JVerifyPlugin.dart';
 import 'package:canknow_aggregate_app/utils/WechatUtil.dart';
 import 'package:flutter/foundation.dart';
@@ -14,7 +16,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (!kIsWeb) {
+  if (Platform.isAndroid) {
     await FlutterDownloader.initialize(debug: true);
   }
   
