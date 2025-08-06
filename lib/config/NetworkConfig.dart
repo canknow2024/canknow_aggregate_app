@@ -74,4 +74,4 @@ class NetworkConfig {
   static String getApiUrl() {
     return 'https://aggregate-daily.dtty.tech'; // 生产环境API地址
   }
-} 
+}
