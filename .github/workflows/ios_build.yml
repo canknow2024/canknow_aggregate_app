@@ -19,8 +19,11 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'  # 指定 Flutter 版本以确保一致性
-          cache: true  # 启用缓存以加速构建
+          flutter-version: 'stable'  # 使用最新稳定版，确保包含 Dart 3.7+
+          cache: true
+          
+      - name: Disable Flutter analytics
+        run: flutter config --no-analytics
 
       - name: Get dependencies
         run: flutter pub get
