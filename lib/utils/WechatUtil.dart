@@ -12,7 +12,7 @@ class WechatUtil {
       appId: WechatConfig.appId,
       doOnAndroid: true,
       doOnIOS: true,
-      universalLink: 'https://your.univerallink.com/link/',
+      universalLink: WechatConfig.universalLink,
     );
     var result = await fluwx.isWeChatInstalled;
   }

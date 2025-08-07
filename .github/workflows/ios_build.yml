@@ -94,7 +94,16 @@ jobs:
           echo "创建 iOS Archive..."
           cd ios
           set -e
-          # 使用通用设备目标，跳过设备验证
+          # 检查使用哪个描述文件
+          if [ -f "signing/Development.mobileprovision" ]; then
+            PROFILE_NAME="task-development"
+            echo "使用 Development 描述文件: task-development"
+          else
+            PROFILE_NAME="task-ad-hoc"
+            echo "使用 AdHoc 描述文件: task-ad-hoc"
+          fi
+          
+          # 使用通用设备目标，覆盖项目中的描述文件配置
           xcodebuild -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
@@ -104,6 +113,7 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Distribution: BING TAN (323LXQXZ6R)" \
             DEVELOPMENT_TEAM=323LXQXZ6R \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
             -allowProvisioningUpdates
           echo "✅ Archive 创建完成"
 
