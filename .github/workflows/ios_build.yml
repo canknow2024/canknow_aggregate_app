@@ -40,38 +40,24 @@ jobs:
           echo "🔍 检查证书文件信息:"
           ls -lh ios/signing/ios_distribution.p12
           
-          # 导入证书到临时钥匙串
-          security import ios/signing/ios_distribution.p12 -k build.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+          # 导入证书到临时钥匙串，添加 -A 参数允许所有应用访问
+          security import ios/signing/ios_distribution.p12 -k build.keychain -P "$P12_PASSWORD" -A
+          
+          # 设置证书信任和访问权限
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" build.keychain
           
           # 验证证书导入
           echo "验证证书导入..."
           security find-identity -v -p codesigning build.keychain
           
-          # 详细检查证书信息
-          echo "🔍 详细证书信息:"
-          security find-identity -v -p codesigning build.keychain | while read line; do
-            if [[ $line =~ ^[0-9]+\) ]]; then
-              echo "找到证书: $line"
-              # 提取证书哈希
-              cert_hash=$(echo "$line" | awk '{print $2}')
-              echo "证书哈希: $cert_hash"
-              
-              # 获取证书详细信息
-              echo "证书详细信息:"
-              security find-certificate -c "$cert_hash" build.keychain
-            fi
-          done
+          # 简化证书检查，避免复杂的解析
+          echo "🔍 检查可用的签名身份:"
+          security find-identity -v -p codesigning build.keychain | grep -E "(Apple Distribution|iPhone Distribution)" || echo "❌ 未找到分发证书"
           
-          # 检查是否有 iPhone Distribution 证书
-          echo "🔍 检查 iPhone Distribution 证书:"
-          security find-identity -v -p codesigning build.keychain | grep -i "iPhone Distribution" || echo "❌ 未找到 iPhone Distribution 证书"
-          
-          # 检查是否有 Apple Distribution 证书
-          echo "🔍 检查 Apple Distribution 证书:"
-          security find-identity -v -p codesigning build.keychain | grep -i "Apple Distribution" || echo "❌ 未找到 Apple Distribution 证书"
-          
-          # 设置证书信任
-          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+          # 验证钥匙串设置
+          echo "🔍 钥匙串设置验证:"
+          security list-keychains
+          security default-keychain
 
       - name: Copy provisioning profile
         run: |
