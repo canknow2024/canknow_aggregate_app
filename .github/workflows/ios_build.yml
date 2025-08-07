@@ -18,22 +18,35 @@ jobs:
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'  # 指定 Flutter 版本以确保一致性
+          cache: true  # 启用缓存以加速构建
 
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Clean and setup iOS dependencies
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Setup iOS dependencies
         run: |
-          echo "清理和重新设置 iOS 依赖..."
           cd ios
-          rm -rf Pods
-          rm -rf Podfile.lock
-          pod install --repo-update
+          if [ ! -d "Pods" ]; then
+            echo "安装 iOS 依赖..."
+            pod install --repo-update
+          else
+            echo "更新 iOS 依赖..."
+            pod install
+          fi
 
       - name: Setup keychain
         run: |
-          echo "设置钥匙串..."
-          # 创建临时钥匙串
+          echo "设置构建钥匙串..."
           security create-keychain -p "" build.keychain
           security list-keychains -s build.keychain
           security default-keychain -s build.keychain
@@ -43,74 +56,56 @@ jobs:
       - name: Import signing certificate
         run: |
           echo "导入签名证书..."
-          
-          # 检查证书文件信息
-          echo "🔍 检查证书文件信息:"
-          ls -lh ios/signing/ios_distribution.p12
-          
-          # 导入证书到临时钥匙串，添加 -A 参数允许所有应用访问
           security import ios/signing/ios_distribution.p12 -k build.keychain -P "$P12_PASSWORD" -A
-          
-          # 设置证书信任和访问权限
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" build.keychain
           
           # 验证证书导入
-          echo "验证证书导入..."
-          security find-identity -v -p codesigning build.keychain
-          
-          # 简化证书检查，避免复杂的解析
-          echo "🔍 检查可用的签名身份:"
-          security find-identity -v -p codesigning build.keychain | grep -E "(Apple Distribution|iPhone Distribution)" || echo "❌ 未找到分发证书"
-          
-          # 验证钥匙串设置
-          echo "🔍 钥匙串设置验证:"
-          security list-keychains
-          security default-keychain
+          if security find-identity -v -p codesigning build.keychain | grep -E "(Apple Distribution|iPhone Distribution)" > /dev/null; then
+            echo "✅ 证书导入成功"
+          else
+            echo "❌ 证书导入失败"
+            exit 1
+          fi
 
       - name: Copy provisioning profile
         run: |
-          echo "复制描述文件..."
+          echo "配置描述文件..."
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp ios/signing/AdHoc.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-          
-          # 验证描述文件
-          echo "验证描述文件..."
-          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+          echo "✅ 描述文件配置完成"
 
       - name: Build iOS
         run: |
-          echo "开始构建iOS应用..."
-          
-          # 显示当前钥匙串信息
-          echo "🔍 当前钥匙串信息:"
-          security list-keychains
-          security default-keychain
-          
-          # 显示可用证书
-          echo "🔑 可用证书:"
-          security find-identity -v -p codesigning build.keychain
-          
-          # 显示描述文件
-          echo "📋 描述文件:"
-          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
-          
-          # 开始构建
-          echo "🚀 开始 Flutter 构建..."
-          flutter build ios --release
+          echo "构建 Flutter iOS 应用..."
+          flutter build ios --release --no-codesign
+          echo "✅ Flutter 构建完成"
 
       - name: Build Archive
         run: |
+          echo "创建 iOS Archive..."
           cd ios
-          # 使用 -destination generic/platform=iOS 来避免设备特定的问题
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -destination generic/platform=iOS -archivePath ${{ github.workspace }}/build/Runner.xcarchive archive -allowProvisioningUpdates
+          set -e
+          timeout 1800 xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive
+          echo "✅ Archive 创建完成"
 
       - name: Export IPA
         run: |
+          echo "导出 IPA 文件..."
           cd ios
-          xcodebuild -exportArchive -archivePath ${{ github.workspace }}/build/Runner.xcarchive -exportOptionsPlist signing/ExportOptions.plist -exportPath ${{ github.workspace }}/build/ios
+          set -e
+          timeout 600 xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist signing/ExportOptions.plist -exportPath build -allowProvisioningUpdates
+          
+          # 验证 IPA 文件生成
+          if ls build/*.ipa 1> /dev/null 2>&1; then
+            echo "✅ IPA 文件导出成功"
+            ls -lh build/*.ipa
+          else
+            echo "❌ IPA 文件导出失败"
+            exit 1
+          fi
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
-          path: build/ios/*.ipa
+          path: ios/build/*.ipa
