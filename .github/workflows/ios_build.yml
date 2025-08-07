@@ -74,8 +74,14 @@ jobs:
         run: |
           echo "配置描述文件..."
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp ios/signing/AdHoc.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-          echo "✅ 描述文件配置完成"
+          # 检查是否存在 Development 描述文件，如果不存在则使用 AdHoc
+          if [ -f "ios/signing/Development.mobileprovision" ]; then
+            cp ios/signing/Development.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+            echo "✅ 使用 Development 描述文件"
+          else
+            cp ios/signing/AdHoc.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+            echo "⚠️  使用 AdHoc 描述文件（建议创建 Development 版本）"
+          fi
 
       - name: Build iOS
         run: |
@@ -88,7 +94,17 @@ jobs:
           echo "创建 iOS Archive..."
           cd ios
           set -e
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive
+          # 使用通用设备目标，跳过设备验证
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -destination generic/platform=iOS \
+            -archivePath build/Runner.xcarchive \
+            archive \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution: BING TAN (323LXQXZ6R)" \
+            DEVELOPMENT_TEAM=323LXQXZ6R \
+            -allowProvisioningUpdates
           echo "✅ Archive 创建完成"
 
       - name: Export IPA
@@ -96,7 +112,12 @@ jobs:
           echo "导出 IPA 文件..."
           cd ios
           set -e
-          xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist signing/ExportOptions.plist -exportPath build -allowProvisioningUpdates
+          # 使用 CI 专用的导出配置
+          xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportOptionsPlist signing/ExportOptions-CI.plist \
+            -exportPath build \
+            -allowProvisioningUpdates
           
           # 验证 IPA 文件生成
           if ls build/*.ipa 1> /dev/null 2>&1; then
