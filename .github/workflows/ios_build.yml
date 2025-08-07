@@ -22,6 +22,14 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Clean and setup iOS dependencies
+        run: |
+          echo "清理和重新设置 iOS 依赖..."
+          cd ios
+          rm -rf Pods
+          rm -rf Podfile.lock
+          pod install --repo-update
+
       - name: Setup keychain
         run: |
           echo "设置钥匙串..."
@@ -93,7 +101,8 @@ jobs:
       - name: Build Archive
         run: |
           cd ios
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath ${{ github.workspace }}/build/Runner.xcarchive archive
+          # 使用 -destination generic/platform=iOS 来避免设备特定的问题
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -destination generic/platform=iOS -archivePath ${{ github.workspace }}/build/Runner.xcarchive archive -allowProvisioningUpdates
 
       - name: Export IPA
         run: |
