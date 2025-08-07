@@ -88,7 +88,7 @@ jobs:
           echo "创建 iOS Archive..."
           cd ios
           set -e
-          timeout 1800 xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive
           echo "✅ Archive 创建完成"
 
       - name: Export IPA
@@ -96,7 +96,7 @@ jobs:
           echo "导出 IPA 文件..."
           cd ios
           set -e
-          timeout 600 xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist signing/ExportOptions.plist -exportPath build -allowProvisioningUpdates
+          xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist signing/ExportOptions.plist -exportPath build -allowProvisioningUpdates
           
           # 验证 IPA 文件生成
           if ls build/*.ipa 1> /dev/null 2>&1; then
